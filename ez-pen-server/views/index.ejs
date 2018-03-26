@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+  <meta name="author" content="oxxo.studio">
+  <meta name="copyright" content="oxxo.studio">
+  <meta name=viewport content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+	<title>ezPen</title>
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
+
+	<script>
+  var time = 1;
+  let detect = false;
+
+  let prevX = 0;
+  let prevY = 0;
+  let prevZ = 0;
+
+	if(window.DeviceOrientationEvent) {
+		// window.addEventListener('deviceorientation', function(event) {
+  //     if(detect) {
+  //       var a = document.getElementById('alpha'),
+  //         b = document.getElementById('beta'),
+  //         g = document.getElementById('gamma'),
+  //         alpha = event.alpha,
+  //         beta = event.beta,
+  //         gamma = event.gamma;
+      
+  //     a.innerHTML = Math.round(alpha);
+  //     b.innerHTML = Math.round(beta);
+  //     g.innerHTML = Math.round(gamma);
+  //     }
+          
+		// }, false);
+
+
+    window.addEventListener('devicemotion', function(event) {
+          if(detect) {
+                var tx = document.getElementById('tx'),
+                ty = document.getElementById('ty'),
+                tz = document.getElementById('tz'),
+                x = Math.round(event.acceleration.x),
+                y = Math.round(event.acceleration.y),
+                z = Math.round(event.acceleration.z);
+
+                if(x != prevX || y != prevY || z != prevZ) { // if x, y, and z are not equal to the previous objects
+                  prevX = x;
+                  prevY = y;
+                  prevZ = z; // set this as our previous values
+                  document.getElementById("tt").value = (time);
+                  document.getElementById("x").value = x; // assign values to the web
+                  document.getElementById("y").value = y;
+                  document.getElementById("z").value = z;
+                  tx.innerHTML = x;
+                  ty.innerHTML = y;
+                  tz.innerHTML = z;
+
+                  $.ajax({ // post new data
+                  type: "POST",
+                  url: "/test",
+                  data: {
+                    X: x, 
+                    Y: y, 
+                    Z: z,
+                    T: time
+                    },
+                  });
+                }
+            time = time + 1; // increment ticks
+          }
+
+
+          //}, 50000);
+    
+
+
+    }, false);
+
+  }else{
+  	document.querySelector('body').innerHTML = 'error occurred!';
+  }
+
+
+
+  function trigger() {
+    detect = !detect;
+  }
+	</script>
+</head>
+<body>
+  <div id="data"> 
+	alpha:<span id="alpha"></span><br/>
+	beta:<span id="beta"></span><br/>
+	gamma:<span id="gamma"></span><br/>
+	
+  x:<span id="tx"></span><br/>
+  y:<span id="ty"></span><br/>
+  z:<span id="tz"></span><br/>
+  ticks:<span id="tt"></span><br/>
+  </div>
+
+  <div id="statusChange">
+  <button onclick="trigger();"> Activate! </button>
+  </div>
+
+  <form method="post" action="/" name="dataForm" id="dataForm">
+    <input id = "x" type="text" name="input[obj1]">
+    <input id = "y" type="text" name="input[obj2]">
+    <input id = "z" type="text" name="input[obj3]">
+  </form>
+
+
+
+  <style>
+  #info {
+    position: fixed;
+    z-index: 999;
+    bottom: 20px;
+    left: 0px;
+    background: #222;
+    padding: 20px 30px;
+    color: #fff;
+    box-shadow: rgba(0, 0, 0, .5) 0 0 10px;
+    border-radius: 0 5px 5px 0;
+		font-size:16px;
+  }
+  
+  #info a {
+    color: #0bf;
+    transition: .2s;
+  }
+  
+  #info a:hover {
+    color: #6df;
+  }
+  </style>
+
+</body>
+</html>
